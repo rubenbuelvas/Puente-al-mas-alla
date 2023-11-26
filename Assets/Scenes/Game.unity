@@ -1031,6 +1031,7 @@ MonoBehaviour:
   - Es una gonorrea
   heavenButton: {fileID: 1359921408}
   hellButton: {fileID: 1029454761}
+  descriptionText: {fileID: 788682439}
 --- !u!4 &797527671
 Transform:
   m_ObjectHideFlags: 0

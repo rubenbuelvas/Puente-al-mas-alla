@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +18,7 @@ public class player : MonoBehaviour
     public List<string> NPCDescriptionList;
     public Button heavenButton;
     public Button hellButton;
+    public TextMeshProUGUI descriptionText;
 
     NPC currentNPC;
     Queue<NPC> NPCQueue;
@@ -59,6 +61,7 @@ public class player : MonoBehaviour
     {
         currentNPC = NPCQueue.Dequeue();
         currentNPC.gameObject = Instantiate(currentNPC.gameObject);
+        descriptionText.text = currentNPC.description;
         Debug.Log(currentNPC.name);
         Debug.Log(currentNPC.description);
     }
