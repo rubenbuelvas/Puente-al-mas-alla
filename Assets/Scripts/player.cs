@@ -24,6 +24,11 @@ public class player : MonoBehaviour
     public Button heavenButton;
     public Button hellButton;
     public TextMeshProUGUI descriptionText;
+    public GameObject modal;
+    public TextMeshProUGUI modalHeader;
+    public TextMeshProUGUI modalBody;
+    public Button modalButton;
+    public TextMeshProUGUI modalButtonText;
     public GameObject trap;
 
     NPC currentNPC;
@@ -34,9 +39,11 @@ public class player : MonoBehaviour
 
     void Start()
     {
+        modal.SetActive(false);
         InitiateNPCQueue();
         heavenButton.onClick.AddListener(SendToHeaven);
         hellButton.onClick.AddListener(SendToHell);
+        modalButton.onClick.AddListener(MoveToNextNPC);
         if (NPCQueue.Count > 0)
         {
             UpdateNPC();
@@ -62,12 +69,11 @@ public class player : MonoBehaviour
 
     void SendToHeaven()
     {
-        EditorUtility.DisplayDialog("¡Decisión!", "Enviaste a " + currentNPC.name + " al cielo", "Ok");
+        ActivateModal("¡Decisión!", "Enviaste a " + currentNPC.name + " al cielo", "Siguiente");
         if (currentNPC.goesToHeaven)
         {
             points++;
         }
-        MoveToNextNPC();
     }
 
     void SendToHell()
@@ -89,15 +95,15 @@ public class player : MonoBehaviour
         }
         if (NPCQueue.Count == 0)
         {
+            modalButton.onClick.AddListener(RestartScene);
             if (points < minimumPoints)
             {
-                EditorUtility.DisplayDialog("Perdiste :(", "No tomaste buenas decisiones. Inténtalo de nuevo.", "Reiniciar");
+                ActivateModal("Perdiste :(", "No tomaste buenas decisiones. Inténtalo de nuevo.", "Reiniciar");
             }
             else
             {
-                EditorUtility.DisplayDialog("Ganaste :D", "Tomaste buenas decisiones. ¡Gracias por jugar!", "Reiniciar");
+                ActivateModal("Ganaste :D", "Tomaste buenas decisiones. ¡Gracias por jugar!", "Reiniciar");
             }
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             return;
         }
         Destroy(currentNPC.gameObject);
@@ -118,7 +124,19 @@ public class player : MonoBehaviour
         Destroy(currentTrap);
         currentTrap = null;
         yield return new WaitForSeconds(2);
-        EditorUtility.DisplayDialog("¡Decisión!", "Enviaste a " + currentNPC.name + " al infierno", "Ok");
-        MoveToNextNPC();
+        ActivateModal("¡Decisión!", "Enviaste a " + currentNPC.name + " al infierno", "Siguiente");
+    }
+
+    void ActivateModal(string header, string body, string buttonText)
+    {
+        modal.SetActive(true);
+        modalHeader.text = header;
+        modalBody.text = body;
+        modalButtonText.text = buttonText;
+    }
+
+    void RestartScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
