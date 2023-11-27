@@ -1063,6 +1063,7 @@ MonoBehaviour:
     Era animalista."
   - Vegetariano. En algunos juegos aparece como una persona potencialmente capaz
     de causar un holocausto nuclear.
+  NPCGoesToHeavenList: 0001
   heavenButton: {fileID: 1359921408}
   hellButton: {fileID: 1029454761}
   descriptionText: {fileID: 788682439}

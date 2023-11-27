@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class NPC
@@ -10,6 +11,7 @@ public class NPC
     public GameObject gameObject;
     public string name;
     public string description;
+    public bool goesToHeaven;
 }
 
 public class player : MonoBehaviour
@@ -17,6 +19,8 @@ public class player : MonoBehaviour
     public List<GameObject> NPCGameObjectList;
     public List<string> NPCNameList;
     public List<string> NPCDescriptionList;
+    public List<bool> NPCGoesToHeavenList;
+
     public Button heavenButton;
     public Button hellButton;
     public TextMeshProUGUI descriptionText;
@@ -25,17 +29,20 @@ public class player : MonoBehaviour
     NPC currentNPC;
     Queue<NPC> NPCQueue;
     GameObject currentTrap;
+    int points;
+    int minimumPoints;
 
     void Start()
     {
         InitiateNPCQueue();
-        // Differentiate heaven and hell
         heavenButton.onClick.AddListener(SendToHeaven);
         hellButton.onClick.AddListener(SendToHell);
         if (NPCQueue.Count > 0)
         {
             UpdateNPC();
         }
+        points = 0;
+        minimumPoints = 2;
     }
 
     void InitiateNPCQueue()
@@ -48,30 +55,49 @@ public class player : MonoBehaviour
             npc.gameObject = NPCGameObjectList[i];
             npc.name = NPCNameList[i];
             npc.description = NPCDescriptionList[i];
+            npc.goesToHeaven = NPCGoesToHeavenList[i];
             NPCQueue.Enqueue(npc);
         }
     }
 
     void SendToHeaven()
     {
-        EditorUtility.DisplayDialog("Decisión!", "Enviaste a " + currentNPC.name + " al cielo", ":D", ":(");
+        EditorUtility.DisplayDialog("¡Decisión!", "Enviaste a " + currentNPC.name + " al cielo", "Ok");
+        if (currentNPC.goesToHeaven)
+        {
+            points++;
+        }
         MoveToNextNPC();
     }
 
     void SendToHell()
     {
+        if (!currentNPC.goesToHeaven)
+        {
+            points++;
+        }
         StartCoroutine(Waiter());
     }
 
     void MoveToNextNPC()
     {
+        Debug.Log(points);
+        Debug.Log(minimumPoints);
         if (currentTrap == null)
         {
             currentTrap = Instantiate(trap);
         }
         if (NPCQueue.Count == 0)
         {
-            EditorUtility.DisplayDialog("Fin", "Gracias por jugar la demo!", "ok", ":(");
+            if (points < minimumPoints)
+            {
+                EditorUtility.DisplayDialog("Perdiste :(", "No tomaste buenas decisiones. Inténtalo de nuevo.", "Reiniciar");
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("Ganaste :D", "Tomaste buenas decisiones. ¡Gracias por jugar!", "Reiniciar");
+            }
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             return;
         }
         Destroy(currentNPC.gameObject);
@@ -87,17 +113,12 @@ public class player : MonoBehaviour
         //Debug.Log(currentNPC.description);
     }
 
-    void ActivateTrap()
-    {
-        trap.transform.Rotate(new Vector3(90f, 0));
-    }
-
     IEnumerator Waiter()
     {
         Destroy(currentTrap);
         currentTrap = null;
         yield return new WaitForSeconds(2);
-        EditorUtility.DisplayDialog("Decisión!", "Enviaste a " + currentNPC.name + " al infierno", ":D", ":(");
+        EditorUtility.DisplayDialog("¡Decisión!", "Enviaste a " + currentNPC.name + " al infierno", "Ok");
         MoveToNextNPC();
     }
 }
